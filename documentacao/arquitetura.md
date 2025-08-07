@@ -49,4 +49,6 @@ O frontend utiliza **Next.js** com arquitetura baseada em:
 
 ### Diagrama de Pacotes Detalhado - Backend
 
+<img src="diagrama-pacotes-backend.png" alt="Diagrama de Pacotes Backend">
+
 ### Diagrama de Pacotes Detalhado - Frontend
