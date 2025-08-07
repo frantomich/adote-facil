@@ -44,3 +44,9 @@ O frontend utiliza **Next.js** com arquitetura baseada em:
 ### 3. Camada de Estado (Contexts/Providers)
 - **Localização**: `frontend/src/contexts/` e `frontend/src/providers/`
 - **Responsabilidade**: Gerenciamento de estado global
+
+## Diagrama de Componentes e Pacotes
+
+### Diagrama de Pacotes Detalhado - Backend
+
+### Diagrama de Pacotes Detalhado - Frontend
