@@ -1,4 +1,4 @@
-# Padrões e Princípios de Projeto
+# Princípios e Padrões de Projeto
 
 ## Princípios SOLID
 
