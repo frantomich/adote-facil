@@ -26,7 +26,9 @@ export function AnimalDetailsPage() {
 
   useEffect(() => {
     const getAnimalResponse = getAnimalById(params.id)
-    console.log({ getAnimalResponse })
+
+    // (Código de debug esquecido) A linha do console.log foi simplesmente removida.
+
     setAnimal(getAnimalResponse)
   }, [getAnimalById, params.id])
 

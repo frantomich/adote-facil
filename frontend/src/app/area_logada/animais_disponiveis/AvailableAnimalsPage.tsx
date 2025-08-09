@@ -30,7 +30,8 @@ export function AvailableAnimalsPage() {
 
       const response = await getAvailableAnimals(filter, token || '')
 
-      console.log(response)
+
+      // (Código de debug esquecido) A linha do console.log foi simplesmente removida.
 
       if (response.status === 200) {
         setAvailableAnimals(response.data.animals)
