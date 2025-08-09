@@ -5,6 +5,8 @@ import {
   animalRepositoryInstance,
 } from '../../repositories/animal.js'
 
+import { AnimalFormatter } from '../../utils/animal-formatter.js' // importacao da nova classe AnimalFormatter
+
 export namespace GetUserAnimalsDTO {
   export type Params = {
     userId: string
@@ -27,14 +29,22 @@ export class GetUserAnimalsService {
 
     const animals = await this.animalRepository.findAllByUserId(userId)
 
-    const formattedAnimals = animals.map((animal) => {
-      return {
-        ...animal,
-        images: animal.images.map((image) => {
-          return image.imageData.toString('base64')
-        }),
-      }
-    })
+
+    // INÍCIO DA DUPLICAÇÃO
+
+    // const formattedAnimals = animals.map((animal) => {
+    //   return {
+    //     ...animal,
+    //     images: animal.images.map((image) => {
+    //       return image.imageData.toString('base64')
+    //     }),
+    //   }
+    // })
+    
+    // FIM DA DUPLICAÇÃO
+
+    // Usando o formatador para simplificar
+    const formattedAnimals = AnimalFormatter.formatAnimalsWithImages(animals)
 
     return Success.create({ animals: formattedAnimals })
   }
