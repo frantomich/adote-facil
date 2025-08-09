@@ -6,6 +6,8 @@ import {
 import { Encrypter, encrypterInstance } from '../../providers/encrypter.js'
 import { Either, Failure, Success } from '../../utils/either.js'
 
+import { ErrorMessages } from '../../utils/error-messages.js' // Importa as constantes
+
 namespace CreateUserDTO {
   export type Params = {
     name: string
@@ -32,7 +34,7 @@ export class CreateUserService {
     const userAlreadyExists = await this.userRepository.findByEmail(email)
 
     if (userAlreadyExists) {
-      return Failure.create({ message: 'Email já cadastrado.' })
+      return Failure.create({ message: ErrorMessages.USER_ALREADY_EXISTS }) //correcao aqui
     }
 
     const hashedPassword = this.encrypter.encrypt(password)

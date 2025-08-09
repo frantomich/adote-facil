@@ -9,6 +9,8 @@ import {
 } from '../../repositories/user.js'
 import { Either, Failure, Success } from '../../utils/either.js'
 
+import { ErrorMessages } from '../../utils/error-messages.js' // Importa as constantes
+
 export namespace UserLoginDTO {
   export type Params = {
     email: string
@@ -42,13 +44,13 @@ export class UserLoginService {
     const user = await this.userRepository.findByEmail(email)
 
     if (!user) {
-      return Failure.create({ message: 'Email ou senha inválidos.' })
+      return Failure.create({ message: ErrorMessages.INVALID_CREDENTIALS }) // correcao aqui
     }
 
     const isValidPassword = this.encrypter.compare(password, user.password)
 
     if (!isValidPassword) {
-      return Failure.create({ message: 'Email ou senha inválidos.' })
+      return Failure.create({ message: ErrorMessages.INVALID_CREDENTIALS }) // correcao aqui
     }
 
     const token = this.authenticator.generateToken({
