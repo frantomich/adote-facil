@@ -29,6 +29,10 @@ O backend segue uma arquitetura em **4 camadas principais**:
 - **Database**: Configuração do Prisma e conexão com PostgreSQL
 - **Config**: Configurações de upload e outras funcionalidades
 
+### Diagrama de Pacotes do Backend
+
+<img src="./DiagramaDePacotesBack.png" alt="Diagrama de Pacotes do Backend">
+
 ## Estrutura do Frontend
 
 O frontend utiliza **Next.js** com arquitetura baseada em:
@@ -45,10 +49,6 @@ O frontend utiliza **Next.js** com arquitetura baseada em:
 - **Localização**: `frontend/src/contexts/` e `frontend/src/providers/`
 - **Responsabilidade**: Gerenciamento de estado global
 
-## Diagrama de Componentes e Pacotes
+### Diagrama de Pacotes do Frontend
 
-### Diagrama de Pacotes Detalhado - Backend
-
-<img src="diagrama-pacotes-backend.png" alt="Diagrama de Pacotes Backend">
-
-### Diagrama de Pacotes Detalhado - Frontend
+<img src="./DiagramaDePacotesFront.png" alt="Diagrama de Pacotes do Frontend">
