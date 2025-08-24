@@ -1,148 +1,82 @@
-# **Relatório de Testes Automatizados**
+# Projeto Adote Fácil
 
-## **Visão Geral**
-Este documento detalha a estratégia de testes automatizados proposta para o projeto Adote Fácil. A abordagem é dividida em duas camadas principais: Testes Unitários para o backend, garantindo a lógica de negócio, e Testes de Aceitação (E2E) para o frontend, garantindo que as jornadas do usuário funcionem de ponta a ponta.
+## Introdução
 
----
+O "Adote Fácil" é um sistema voltado para facilitar a adoção de animais. A API provê serviços para gerenciamento de usuários, autenticação, cadastro de animais e gerenciamento de chats entre os usuários. O backend é construído com Node.js e Express, utilizando middlewares para autenticação e tratamento de upload de imagens. O frontend é desenvolvido com Next.js e React, proporcionando uma interface dinâmica e responsiva.
 
-## **1. Testes Unitários (Backend)**
+## Tecnologias
 
-### **1.1. Análise e Proposta**
+- Node.js
+- Express
+- Multer (upload de arquivos)
+- Axios (requisições HTTP no frontend)
+- JWT (validação de tokens)
+- Zod (validação dos dados no frontend)
+- React (Next.js no frontend)
+- Prisma (ORM no backend)
+- PostgreSQL (banco de dados)
 
-Após análise, constatou-se que o projeto não possuía uma suíte de testes unitários. A principal melhoria proposta é a criação dessa suíte com foco em validar as regras de negócio de forma isolada, principalmente os **casos de uso (use cases)**.
+## Documentação de rotas da API
 
-A estratégia utiliza o framework **Jest** (ou similar, como Vitest) e o conceito de *mocks* com repositórios em memória para isolar os testes do banco de dados real, tornando-os mais rápidos e determinísticos.
+### Rotas de Usuários
 
-### **1.2. Exemplo de Implementação: `CreatePetUseCase`**
+- **POST `/users`**
+  Cria um novo usuário.
+  _Exemplo de uso:_ Envio de dados com nome, email e senha para cadastro.
 
-A seguir, um exemplo prático de como testar o caso de uso de criação de um novo pet.
+- **PATCH `/users`**
+  Atualiza informações do usuário autenticado.
+  _Exemplo de uso:_ Atualização de dados do perfil.
 
-```javascript
-// Arquivo: src/use-cases/tests/create-pet.spec.ts
+### Rotas de Autenticação
 
-import { it, describe, expect, beforeEach } from 'vitest';
-import { CreatePetUseCase } from '../create-pet-use-case';
-import { InMemoryPetsRepository } from '@/repositories/in-memory/in-memory-pets-repository';
+- **POST `/login`**
+  Autentica um usuário utilizando email e senha. Retorna um token JWT e os dados do usuário em caso de sucesso.
 
-let petsRepository: InMemoryPetsRepository;
-let sut: CreatePetUseCase; // sut = System Under Test
+### Rotas de Chats
 
-describe('Create Pet Use Case', () => {
-  beforeEach(() => {
-    // Usamos um repositório em memória para não tocar no banco de dados real
-    petsRepository = new InMemoryPetsRepository(); 
-    sut = new CreatePetUseCase(petsRepository);
-  });
+- **POST `/users/chats/messages`**
+  Envia uma nova mensagem em um chat.
+  _Exemplo de uso:_ Permite que o usuário envie uma mensagem para um chat existente.
 
-  it('should be able to create a new pet', async () => {
-    // Act (Agir)
-    const { pet } = await sut.execute({
-      name: 'Caramelinho',
-      about: 'Um doguinho muito amigável',
-      age: 'filhote',
-      size: 'médio',
-      energy_level: 'alta',
-      org_id: 'org-01',
-    });
+- **POST `/users/chats`**
+  Cria um novo chat entre usuários.
+  _Exemplo de uso:_ Inicia uma conversa entre dois ou mais usuários.
 
-    // Assert (Afirmar)
-    expect(pet.id).toEqual(expect.any(String)); // Esperamos que o pet tenha um ID
-    expect(pet.name).toEqual('Caramelinho');
-  });
-});
+- **GET `/users/chats`**
+  Lista todos os chats do usuário autenticado.
+
+- **GET `/users/chats/:chatId`**
+  Recupera os detalhes de um chat específico pelo seu ID.
+
+### Rotas de Animais
+
+- **POST `/animals`**
+  Cria um novo anúncio de animal para adoção.
+  _Exemplo de uso:_ Envio de dados do animal e imagens (até 5 arquivos) utilizando o multer.
+
+- **PATCH `/animals/:id`**
+  Atualiza o status de um animal.
+  _Exemplo de uso:_ Permite alterar informações como disponibilidade para adoção.
+
+- **GET `/animals/available`**
+  Lista os animais disponíveis para adoção.
+  _Exemplo de uso:_ Permite filtragem por gênero, tipo e nome.
+
+- **GET `/animals/user`**
+  Recupera os animais associados ao usuário autenticado.
+
+## Tutorial de implantação
+
+Certifique-se de ter o Docker e o Docker Compose instalados na sua máquina. Antes de iniciar o sistema, crie os arquivos .env nos diretórios /backend e /frontend baseando-se nos respectivos arquivos .env.example de cada um destes dois diretórios. Perceba que o conteúdo deles é diferente um do outro.
+
+O arquivo .env.example do backend já contém as variáveis usadas pelo Docker Compose para criar os containers do banco e do backend com os valores corretos, então basta replicá-los. Caso queira, é possível alterá-las também.
+
+As portas de execução do backend e frontend estão hardcoded no arquivo `docker-compose.yml`. O backend executa na porta 8080 e o frontend na porta 3000. É possível alterar estes valores, só tomando cuidado para refletir as alterações nas variáveis de ambiente das APIs.
+
+Para subir os containers, entre na pasta /backend e execute o comando:
+```shell
+docker compose up
 ```
 
----
-
-## **2. Testes de Aceitação (E2E) com Cypress**
-
-Estes testes simulam a interação de um usuário real com a interface gráfica do sistema. Os cenários e códigos a seguir foram criados assumindo a existência de um frontend conectado à API do backend.
-
-### **2.1. Cenário Principal: Cadastro de Pet com Sucesso**
-
-* **Descrição:**
-    * **Dado** que um representante de ONG está logado no sistema e navega para a página de "Cadastro de Pets".
-    * **Quando** ele preenche todos os campos obrigatórios do formulário e clica em "Cadastrar".
-    * **Então** o sistema deve exibir uma mensagem de "Pet cadastrado com sucesso!" e redirecioná-lo para a página de perfil do novo pet.
-* **Cobertura:** Valida o fluxo principal e funcional da funcionalidade de cadastro.
-* **Código Cypress:**
-    ```javascript
-    it('should register a new pet successfully when all data is correct', () => {
-      cy.login('ong@example.com', 'strongpassword');
-      cy.visit('/pets/register');
-      cy.get('[data-cy=pet-name-input]').type('Frajola');
-      cy.get('[data-cy=pet-about-textarea]').type('Gato preto e branco muito esperto.');
-      cy.get('[data-cy=pet-age-select]').select('adulto');
-      cy.get('[data-cy=register-pet-button]').click();
-      cy.contains('Pet cadastrado com sucesso!').should('be.visible');
-      cy.url().should('include', '/pets/');
-    });
-    ```
-
-### **2.2. Cenário Alternativo 1: Falha por Campo Obrigatório**
-
-* **Descrição:**
-    * **Dado** que o representante da ONG está na página de cadastro.
-    * **Quando** ele tenta submeter o formulário sem preencher o campo "Nome".
-    * **Então** o sistema deve exibir uma mensagem de erro de validação e permanecer na mesma página.
-* **Cobertura:** Garante que as validações de formulário estão ativas, prevenindo o envio de dados inválidos.
-* **Código Cypress:**
-    ```javascript
-    it('should show an error message if the name field is left blank', () => {
-      cy.login('ong@example.com', 'strongpassword');
-      cy.visit('/pets/register');
-      cy.get('[data-cy=pet-about-textarea]').type('Gato preto e branco muito esperto.');
-      cy.get('[data-cy=register-pet-button]').click();
-      cy.contains('O nome é obrigatório').should('be.visible');
-      cy.url().should('not.include', '/pets/');
-    });
-    ```
-
-### **2.3. Cenário Alternativo 2: Falha por Falta de Autenticação**
-
-* **Descrição:**
-    * **Dado** um visitante anônimo (não logado).
-    * **Quando** ele tenta acessar a URL de cadastro de pets diretamente.
-    * **Então** o sistema deve redirecioná-lo para a página de login.
-* **Cobertura:** Valida a camada de segurança da aplicação, protegendo rotas restritas.
-* **Código Cypress:**
-    ```javascript
-    it('should redirect unauthenticated users to the login page', () => {
-      cy.visit('/pets/register');
-      cy.url().should('include', '/login');
-      cy.contains('Você precisa estar logado para acessar esta página.').should('be.visible');
-    });
-    ```
-
----
-
-## **3. Instruções de Execução dos Testes**
-
-Este guia descreve como executar os testes automatizados do projeto.
-
-### **3.1. Testes Unitários (Backend)**
-
-* **Pré-requisitos:** Node.js e dependências (`npm install`) instaladas no diretório do backend.
-* **Comandos:**
-    ```bash
-    # Rodar todos os testes unitários uma vez
-    npm test
-
-    # Rodar os testes em modo "watch"
-    npm test -- --watch
-
-    # Gerar um relatório de cobertura de testes
-    npm test -- --coverage
-    ```
-
-### **3.2. Testes de Aceitação / E2E (Frontend)**
-
-* **Pré-requisitos:** Node.js e dependências (`npm install`) instaladas no diretório do frontend. Ambos os servidores (backend e frontend) devem estar rodando.
-* **Comandos:**
-    ```bash
-    # Abrir o Test Runner do Cypress em modo interativo
-    npx cypress open
-
-    # Rodar todos os testes em modo "headless" (linha de comando)
-    npx cypress run
-    ```
+Em seguida, basta acessar a url http://localhost:3000 para ter acesso à plataforma (caso tenha trocado a porta de execução do frontend, altere o 3000 para a porta no qual o frontend está executando).
